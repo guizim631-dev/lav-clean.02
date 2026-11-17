@@ -7,7 +7,7 @@
   <div class="coluna-lateral"><aside class="card"><h3>Como funciona?</h3><ol class="passos"><li>Escolha o serviço</li><li>Confirme o pedido</li><li>Acompanhe o status</li><li>Retire suas roupas</li></ol></aside><a class="card loja-card" href="endereco.html"><img src="loja.svg" alt="Fachada da loja"><strong>Nossa loja</strong><small id="lojaEnd"></small></a></div></div>
 <section class="faixa"><div><h2>Roupas limpas, mais tempo para você</h2><p>Praticidade, qualidade e cuidado com o que é importante.</p></div><img src="toalhas-cesto.svg" alt=""></section>
 </main></div>
-<script src="storage.js"></script><script src="validation.js"></script><script src="services.js"></script><script src="auth.js"></script><script src="loja.js"></script><script src="app.js"></script>
+<script src="storage.js"></script><script src="validation.js"></script><script src="services.js"></script><script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script><script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script><script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script><script src="firebase-config.js"></script><script src="auth.js"></script><script src="loja.js"></script><script src="app.js"></script>
 <script>
 const u = Auth.exigirSessao(); if(u){ montarLayout("inicio.html", u);
  document.querySelector(".corpo").prepend(document.querySelector(".lateral"));

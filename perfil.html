@@ -15,10 +15,10 @@
   <div class="campo"><label for="sn">Nova senha (mín. 6 caracteres)</label><input id="sn" type="password" autocomplete="new-password"><div class="erro"></div></div>
   <div class="campo"><label for="sc">Confirmar nova senha</label><input id="sc" type="password" autocomplete="new-password"><div class="erro"></div></div>
   <button class="btn" type="submit" id="salvarSenha">Alterar senha</button>
-  <p class="aviso-demo">Autenticação de demonstração, sem segurança real.</p></form>
+  <p class="aviso-demo">Login protegido pelo Firebase.</p></form>
 </div>
 </main></div>
-<script src="storage.js"></script><script src="validation.js"></script><script src="services.js"></script><script src="auth.js"></script><script src="orders.js"></script><script src="app.js"></script>
+<script src="storage.js"></script><script src="validation.js"></script><script src="services.js"></script><script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script><script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script><script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script><script src="firebase-config.js"></script><script src="auth.js"></script><script src="orders.js"></script><script src="app.js"></script>
 <script>
 
 let u = iniciarPagina("perfil.html");
@@ -32,11 +32,11 @@ if (u) {
   }
   function aviso(m, ok) { const a = $("alerta"); a.textContent = m; a.className = "alerta " + (ok ? "ok-box" : "erro-box"); scrollTo({ top: 0, behavior: "smooth" }); }
   preencher();
-  $("formDados").onsubmit = e => { e.preventDefault();
+  $("formDados").onsubmit = async e => { e.preventDefault();
     const ok = [Validacao.erro(nome, Validacao.nome(nome.value) ? "" : "Informe nome e sobrenome."), Validacao.erro(tel, Validacao.telefone(tel.value) ? "" : "Telefone com DDD, 10 ou 11 dígitos.")].every(Boolean);
     if (!ok) return;
-    const r = Auth.atualizar(u.id, { nome: nome.value.trim(), telefone: tel.value });
-    if (r.ok) { preencher(); montarLayout("perfil.html", u); document.querySelector(".corpo").prepend(document.querySelector(".lateral")); aviso("Dados atualizados.", true); } else aviso(r.erro); };
+    const r = await Auth.atualizar(u.id, { nome: nome.value.trim(), telefone: tel.value });
+    if (r.ok) { preencher(); montarLayout("perfil.html", u); document.querySelector(".corpo").prepend(document.querySelector(".lateral")); aviso(r.aviso || "Dados atualizados.", true); } else aviso(r.erro); };
   $("formSenha").onsubmit = async e => { e.preventDefault();
     const ok = [Validacao.erro(sa, sa.value ? "" : "Informe a senha atual."), Validacao.erro(sn, Validacao.senha(sn.value) ? "" : "Mínimo de 6 caracteres."), Validacao.erro(sc, sc.value === sn.value ? "" : "As senhas não coincidem.")].every(Boolean);
     if (!ok) return; salvarSenha.disabled = true;

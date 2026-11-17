@@ -166,5 +166,7 @@ html{-webkit-tap-highlight-color:transparent}
 body{padding-top:env(safe-area-inset-top)}
 @media(max-width:900px){.abas{padding-bottom:calc(6px + env(safe-area-inset-bottom))}main{padding-bottom:calc(96px + env(safe-area-inset-bottom))}.topo .btn.pequeno{padding:7px 10px;font-size:.78rem}}
 
-#btnInstalar{display:none !important}
+/* Login com Google e botão de instalar oculto */
+.ou{display:flex;align-items:center;gap:10px;margin:16px 0 12px;color:#7a97ad;font-size:.8rem}.ou::before,.ou::after{content:"";flex:1;height:1px;background:var(--borda)}
+.btn-google{color:var(--texto);border-color:var(--borda)}.btn-google:hover:not(:disabled){background:#f6fafd}
 #btnInstalar{display:none !important}
