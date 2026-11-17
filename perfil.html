@@ -1,0 +1,46 @@
+<!DOCTYPE html><html lang="pt-BR"><head><meta charset="UTF-8"><link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#0b4f87"><link rel="icon" href="icon-192.png"><link rel="apple-touch-icon" href="apple-touch-icon.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="Lav Clean"><meta name="apple-mobile-web-app-status-bar-style" content="default"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><link rel="stylesheet" href="style.css"><link rel="stylesheet" href="responsive.css"><title>Perfil — Lav Clean</title></head><body>
+<div id="shell"></div>
+<div class="corpo"><main>
+<div class="perfil-topo"><span class="avatar" id="av"></span><div><h1 id="pNome"></h1><p id="pEmail"></p><span class="badge">Conta de demonstração</span></div>
+ <div class="stats"><div class="stat"><strong id="sTotal">0</strong><span>pedidos</span></div><div class="stat"><strong id="sAnd">0</strong><span>em andamento</span></div></div></div>
+<div id="alerta" class="alerta" role="alert"></div>
+<div class="duas-colunas">
+ <form class="card" id="formDados" novalidate><h2>Dados pessoais</h2>
+  <div class="campo"><label for="nome">Nome completo</label><input id="nome" autocomplete="name"><div class="erro"></div></div>
+  <div class="campo"><label for="tel">Telefone</label><input id="tel" type="tel" autocomplete="tel"><div class="erro"></div></div>
+  <div class="campo"><label for="email">E-mail</label><input id="email" readonly aria-describedby="dicaEmail"><div class="erro" id="dicaEmail" style="color:#7a97ad">O e-mail identifica sua conta e não pode ser alterado.</div></div>
+  <button class="btn" type="submit" id="salvarDados">Salvar alterações</button></form>
+ <form class="card" id="formSenha" novalidate><h2>Alterar senha</h2>
+  <div class="campo"><label for="sa">Senha atual</label><input id="sa" type="password" autocomplete="current-password"><div class="erro"></div></div>
+  <div class="campo"><label for="sn">Nova senha (mín. 6 caracteres)</label><input id="sn" type="password" autocomplete="new-password"><div class="erro"></div></div>
+  <div class="campo"><label for="sc">Confirmar nova senha</label><input id="sc" type="password" autocomplete="new-password"><div class="erro"></div></div>
+  <button class="btn" type="submit" id="salvarSenha">Alterar senha</button>
+  <p class="aviso-demo">Autenticação de demonstração, sem segurança real.</p></form>
+</div>
+</main></div>
+<script src="storage.js"></script><script src="validation.js"></script><script src="services.js"></script><script src="auth.js"></script><script src="orders.js"></script><script src="app.js"></script>
+<script>
+
+let u = iniciarPagina("perfil.html");
+if (u) {
+  const $ = id => document.getElementById(id);
+  function preencher() {
+    u = Auth.usuarioAtual();
+    $("av").textContent = u.nome.trim()[0].toUpperCase(); $("pNome").textContent = u.nome; $("pEmail").textContent = u.email;
+    nome.value = u.nome; tel.value = u.telefone; email.value = u.email;
+    const ps = Pedidos.doUsuario(u.id); $("sTotal").textContent = ps.length; $("sAnd").textContent = ps.filter(Pedidos.emAndamento).length;
+  }
+  function aviso(m, ok) { const a = $("alerta"); a.textContent = m; a.className = "alerta " + (ok ? "ok-box" : "erro-box"); scrollTo({ top: 0, behavior: "smooth" }); }
+  preencher();
+  $("formDados").onsubmit = e => { e.preventDefault();
+    const ok = [Validacao.erro(nome, Validacao.nome(nome.value) ? "" : "Informe nome e sobrenome."), Validacao.erro(tel, Validacao.telefone(tel.value) ? "" : "Telefone com DDD, 10 ou 11 dígitos.")].every(Boolean);
+    if (!ok) return;
+    const r = Auth.atualizar(u.id, { nome: nome.value.trim(), telefone: tel.value });
+    if (r.ok) { preencher(); montarLayout("perfil.html", u); document.querySelector(".corpo").prepend(document.querySelector(".lateral")); aviso("Dados atualizados.", true); } else aviso(r.erro); };
+  $("formSenha").onsubmit = async e => { e.preventDefault();
+    const ok = [Validacao.erro(sa, sa.value ? "" : "Informe a senha atual."), Validacao.erro(sn, Validacao.senha(sn.value) ? "" : "Mínimo de 6 caracteres."), Validacao.erro(sc, sc.value === sn.value ? "" : "As senhas não coincidem.")].every(Boolean);
+    if (!ok) return; salvarSenha.disabled = true;
+    const r = await Auth.alterarSenha(u.id, sa.value, sn.value); salvarSenha.disabled = false;
+    if (r.ok) { $("formSenha").reset(); aviso("Senha alterada.", true); } else aviso(r.erro); };
+}
+</script></body></html>

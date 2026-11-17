@@ -1,0 +1,52 @@
+<!DOCTYPE html><html lang="pt-BR"><head><meta charset="UTF-8"><link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#0b4f87"><link rel="icon" href="icon-192.png"><link rel="apple-touch-icon" href="apple-touch-icon.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="Lav Clean"><meta name="apple-mobile-web-app-status-bar-style" content="default"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><link rel="stylesheet" href="style.css"><link rel="stylesheet" href="responsive.css"><title>Entrar — Lav Clean</title></head><body>
+<div class="auth">
+ <section class="auth-marca"><div><img class="logo-img" src="logo.png" alt="Lav Clean — lavanderia self-service"><h2>Roupas limpas,<br>mais tempo para você!</h2><p>Praticidade, qualidade e cuidado com o que é importante.</p></div><img class="login-img" src="toalhas-cesto.svg" alt="">
+ </section>
+ <section class="auth-form"><div class="cartao">
+  <div class="abas-auth" role="tablist"><button id="tabEntrar" class="ativa" role="tab">Entrar</button><button id="tabCadastrar" role="tab">Cadastrar</button></div>
+  <div id="alerta" class="alerta" role="alert"></div>
+  <form id="formEntrar" novalidate><h1>Bem-vindo de volta!</h1><p class="sub">Faça login para continuar.</p>
+   <div class="campo"><label for="le">E-mail</label><input id="le" type="email" autocomplete="username" placeholder="Digite seu e-mail"><div class="erro"></div></div>
+   <div class="campo"><label for="ls">Senha</label><input id="ls" type="password" autocomplete="current-password" placeholder="Digite sua senha"><div class="erro"></div></div>
+   <div class="linha-opcoes"><label><input type="checkbox" id="lembrar" checked> Lembrar-me</label></div>
+   <button class="btn bloco" id="btnEntrar" type="submit">Entrar</button></form>
+  <form id="formCadastro" novalidate hidden><h1>Crie sua conta</h1><p class="sub">Leva menos de um minuto.</p>
+   <div class="campo"><label for="cn">Nome completo</label><input id="cn" autocomplete="name"><div class="erro"></div></div>
+   <div class="campo"><label for="ct">Telefone</label><input id="ct" type="tel" placeholder="(11) 91234-5678" autocomplete="tel"><div class="erro"></div></div>
+   <div class="campo"><label for="ce">E-mail</label><input id="ce" type="email" autocomplete="email"><div class="erro"></div></div>
+   <div class="campo"><label for="cs">Senha (mín. 6 caracteres)</label><input id="cs" type="password" autocomplete="new-password"><div class="erro"></div></div>
+   <div class="campo"><label for="cc">Confirmar senha</label><input id="cc" type="password" autocomplete="new-password"><div class="erro"></div></div>
+   <button class="btn bloco" id="btnCadastrar" type="submit">Criar conta</button></form>
+  <button type="button" id="btnInstalar" class="btn sec bloco" hidden style="margin-top:14px">Instalar app no celular</button>
+  <p class="aviso-demo">Autenticação de demonstração: os dados ficam apenas neste navegador.</p>
+ </div></section></div>
+<script src="storage.js"></script><script src="validation.js"></script><script src="services.js"></script><script src="auth.js"></script><script src="app.js"></script>
+<script>
+if (Auth.usuarioAtual()) location.replace("inicio.html");
+const $ = id => document.getElementById(id);
+function aba(entrar){ $("formEntrar").hidden=!entrar; $("formCadastro").hidden=entrar; $("tabEntrar").classList.toggle("ativa",entrar); $("tabCadastrar").classList.toggle("ativa",!entrar); $("alerta").className="alerta"; }
+$("tabEntrar").onclick=()=>aba(true); $("tabCadastrar").onclick=()=>aba(false);
+function aviso(msg,ok){ const a=$("alerta"); a.textContent=msg; a.className="alerta "+(ok?"ok-box":"erro-box"); }
+$("formEntrar").onsubmit = async e => {
+  e.preventDefault();
+  const ok = [Validacao.erro(le, Validacao.email(le.value)?"":"Informe um e-mail válido."), Validacao.erro(ls, ls.value?"":"Informe a senha.")].every(Boolean);
+  if(!ok) return;
+  btnEntrar.disabled=true; btnEntrar.textContent="Entrando...";
+  const r = await Auth.entrar(le.value, ls.value, lembrar.checked);
+  if(r.ok) location.href="inicio.html"; else { aviso(r.erro); btnEntrar.disabled=false; btnEntrar.textContent="Entrar"; }
+};
+$("formCadastro").onsubmit = async e => {
+  e.preventDefault();
+  const ok = [Validacao.erro(cn,Validacao.nome(cn.value)?"":"Informe nome e sobrenome."),
+    Validacao.erro(ct,Validacao.telefone(ct.value)?"":"Telefone com DDD, 10 ou 11 dígitos."),
+    Validacao.erro(ce,Validacao.email(ce.value)?"":"E-mail inválido."),
+    Validacao.erro(cs,Validacao.senha(cs.value)?"":"Mínimo de 6 caracteres."),
+    Validacao.erro(cc,cc.value===cs.value?"":"As senhas não coincidem.")].every(Boolean);
+  if(!ok) return;
+  btnCadastrar.disabled=true;
+  const r = await Auth.cadastrar({nome:cn.value,telefone:ct.value,email:ce.value,senha:cs.value});
+  btnCadastrar.disabled=false;
+  if(r.ok){ le.value=ce.value; $("formCadastro").reset(); aba(true); aviso("Conta criada! Agora é só entrar.",true); }
+  else aviso(r.erro);
+};
+</script></body></html>

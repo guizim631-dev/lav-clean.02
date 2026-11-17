@@ -1,0 +1,26 @@
+<!DOCTYPE html><html lang="pt-BR"><head><meta charset="UTF-8"><link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#0b4f87"><link rel="icon" href="icon-192.png"><link rel="apple-touch-icon" href="apple-touch-icon.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="Lav Clean"><meta name="apple-mobile-web-app-status-bar-style" content="default"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><link rel="stylesheet" href="style.css"><link rel="stylesheet" href="responsive.css"><title>Endereço — Lav Clean</title></head><body>
+<div id="shell"></div>
+<div class="corpo"><main>
+<h1>Endereço da loja</h1>
+<section class="card loja-topo"><img src="loja.svg" alt="Fachada da loja Lav Clean">
+ <div class="loja-info"><h2 id="nome"></h2>
+  <dl class="dl"><dt>Endereço</dt><dd id="end"></dd><dt>CEP</dt><dd id="cep"></dd><dt>Horário</dt><dd id="hor"></dd><dt>Telefone</dt><dd id="tel"></dd></dl>
+  <p class="aviso-demo" style="text-align:left">Dados fictícios, apenas para demonstração.</p>
+  <button class="btn" id="btnMapa" type="button">Ver no mapa</button></div></section>
+<div class="card"><h2>Retirada das roupas</h2><p style="font-size:.92rem;color:#5b7a93">O endereço de retirada dos seus pedidos é o da loja acima.</p></div>
+</main></div>
+<script src="storage.js"></script><script src="validation.js"></script><script src="services.js"></script><script src="auth.js"></script><script src="orders.js"></script><script src="loja.js"></script><script src="app.js"></script>
+<script>
+const u = iniciarPagina("endereco.html");
+if (u) {
+  const $ = id => document.getElementById(id);
+  $("nome").textContent = LOJA.nome; $("end").textContent = LOJA.enderecoTexto; $("cep").textContent = LOJA.cep; $("hor").textContent = LOJA.horario; $("tel").textContent = LOJA.telefone;
+  $("btnMapa").onclick = () => {
+    const d = abrirModal(`<h2>${esc(LOJA.nome)}</h2><p>${esc(LOJA.enderecoTexto)}</p>
+      <div class="mapa"><iframe title="Mapa com a localização da loja" src="${LOJA.mapaEmbed()}" loading="lazy"></iframe></div>
+      <p class="aviso-demo">Localização fictícia, apenas para demonstração. O mapa precisa de internet.</p>
+      <div class="modal-acoes"><a class="btn sec" target="_blank" rel="noopener" href="${LOJA.mapaLink()}">Abrir no Google Maps</a><button class="btn" data-fechar>Fechar</button></div>`);
+    d.classList.add("largo");
+  };
+}
+</script></body></html>

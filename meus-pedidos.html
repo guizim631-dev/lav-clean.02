@@ -1,0 +1,74 @@
+<!DOCTYPE html><html lang="pt-BR"><head><meta charset="UTF-8"><link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#0b4f87"><link rel="icon" href="icon-192.png"><link rel="apple-touch-icon" href="apple-touch-icon.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="Lav Clean"><meta name="apple-mobile-web-app-status-bar-style" content="default"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><link rel="stylesheet" href="style.css"><link rel="stylesheet" href="responsive.css"><title>Meus pedidos — Lav Clean</title></head><body>
+<div id="shell"></div>
+<div class="corpo"><main>
+<div class="cabeca-pagina"><h1>Meus pedidos</h1><a class="btn pequeno" href="servicos.html">Novo atendimento</a></div>
+<form class="busca" id="busca" role="search"><input id="termo" inputmode="numeric" placeholder="Buscar pelo número do pedido (ex.: 001)" aria-label="Buscar pedido"><button class="btn" type="submit">Buscar</button></form>
+<div class="abas-filtro" id="abas"><button data-a="todos" class="ativa">Todos</button><button data-a="andamento">Em andamento</button><button data-a="historico">Histórico</button></div>
+<div id="lista"></div>
+</main></div>
+<script src="storage.js"></script><script src="validation.js"></script><script src="services.js"></script><script src="auth.js"></script><script src="orders.js"></script><script src="loja.js"></script><script src="app.js"></script>
+<script>
+
+const u = iniciarPagina("meus-pedidos.html");
+if (u) {
+  const $ = id => document.getElementById(id);
+  let aba = "todos", termo = "";
+  const data = iso => new Date(iso).toLocaleString("pt-BR", { dateStyle: "short", timeStyle: "short" });
+  function cartao(p) {
+    const pg = p.pagamento.estado;
+    const demo = p.status !== "cancelado" ? `<div class="demo-box">Demonstração:
+      ${pg === "pendente" ? `<button class="btn sec pequeno" data-acao="pagar" data-id="${p.id}">Simular pagamento</button>` : ""}
+      ${STATUS.indexOf(p.status) < STATUS.length - 1 ? `<button class="btn sec pequeno" data-acao="avancar" data-id="${p.id}">Avançar status</button>` : ""}</div>` : "";
+    return `<article class="card pedido"><div class="ic">${icone(Servicos.buscar(p.servicoId)?.icone || "wash", 30)}</div>
+      <div><h3>Pedido ${esc(p.id)} · ${esc(p.servicoNome)}</h3><div class="meta">${data(p.criadoEm)} · ${esc(p.pagamento.forma)}</div>
+        <div class="etiquetas"><span class="badge ${p.status}">${ROTULO_STATUS[p.status]}</span>
+        <span class="badge pg ${pg === "confirmado_simulado" ? "ok" : ""}">${ROTULO_PAGAMENTO[pg]}</span>
+        ${p.precisaEstorno ? `<span class="badge estorno">Estorno necessário</span>` : ""}</div></div>
+      <div class="valor"><div class="preco">${Servicos.formatar(p.preco)}</div><div class="pedido-acoes">
+        <button class="btn sec pequeno" data-acao="detalhes" data-id="${p.id}">Detalhes</button>
+        ${Pedidos.podeCancelar(p) ? `<button class="btn sec pequeno perigo-s" data-acao="cancelar" data-id="${p.id}">Cancelar</button>` : ""}</div></div>${demo}</article>`;
+  }
+  function render() {
+    const todos = Pedidos.doUsuario(u.id);
+    let l = todos;
+    if (aba === "andamento") l = l.filter(Pedidos.emAndamento);
+    if (aba === "historico") l = l.filter(p => !Pedidos.emAndamento(p));
+    if (termo) l = l.filter(p => Pedidos.casaId(p, termo));
+    if (l.length) { $("lista").innerHTML = l.map(cartao).join(""); return; }
+    let t, tx, bt = "";
+    if (!todos.length) { t = "Você ainda não tem pedidos"; tx = "Escolha um serviço para fazer o primeiro atendimento."; bt = `<a class="btn" href="servicos.html">Iniciar atendimento</a>
+      <p style="margin-top:14px;font-size:.8rem">Só para testar: <button class="btn sec pequeno" id="criarDemo">Criar pedido de demonstração</button></p>`; }
+    else if (termo) { t = "Pedido não encontrado"; tx = `Nenhum pedido com o número "${esc(termo)}".`; bt = `<button class="btn sec" id="limpar">Limpar busca</button>`; }
+    else { t = "Nada por aqui"; tx = "Não há pedidos nesta categoria."; }
+    $("lista").innerHTML = `<div class="vazio"><img class="vazio-img" src="toalhas-cesto.svg" alt=""><h2>${t}</h2><p>${tx}</p>${bt}</div>`;
+    $("criarDemo")?.addEventListener("click", () => { Pedidos.criar({ usuarioId: u.id, servicoId: "lavar-secar", endereco: LOJA.enderecoTexto }); toast("Pedido de demonstração criado."); render(); });
+    $("limpar")?.addEventListener("click", () => { termo = ""; $("termo").value = ""; render(); });
+  }
+  function detalhes(p) {
+    abrirModal(`<h2>Pedido ${esc(p.id)}</h2><dl class="dl"><dt>Serviço</dt><dd>${esc(p.servicoNome)}</dd><dt>Valor</dt><dd>${Servicos.formatar(p.preco)}</dd>
+      <dt>Status</dt><dd>${ROTULO_STATUS[p.status]}</dd><dt>Pagamento</dt><dd>${ROTULO_PAGAMENTO[p.pagamento.estado]}</dd><dt>Forma</dt><dd>${esc(p.pagamento.forma)}</dd>
+      <dt>Retirada</dt><dd>${esc(p.endereco || "Não informado")}</dd></dl>${p.precisaEstorno ? `<p class="badge estorno">Estorno necessário (pedido pago foi cancelado)</p>` : ""}
+      <strong>Histórico</strong><ul class="linha-tempo">${p.historico.map(h => `<li>${ROTULO_STATUS[h.status]}<small>${data(h.em)}</small></li>`).join("")}</ul>
+      <div class="modal-acoes"><button class="btn" data-fechar>Fechar</button></div>`);
+  }
+  $("lista").addEventListener("click", async e => {
+    const b = e.target.closest("[data-acao]"); if (!b) return;
+    const p = Pedidos.buscar(b.dataset.id); if (!p) return;
+    if (b.dataset.acao === "detalhes") return detalhes(p);
+    if (b.dataset.acao === "avancar") { Pedidos.avancar(p.id); toast("Status atualizado (demonstração)."); }
+    if (b.dataset.acao === "pagar") { Pedidos.simularPagamento(p.id); toast("Pagamento simulado como confirmado."); }
+    if (b.dataset.acao === "cancelar") {
+      const pago = p.pagamento.estado === "confirmado_simulado";
+      const ok = await confirmarModal({ titulo: "Cancelar pedido " + p.id + "?", perigo: true, ok: "Cancelar pedido",
+        texto: "Esta ação não pode ser desfeita." + (pago ? " Como o pagamento já foi confirmado, o pedido será marcado com necessidade de estorno." : "") });
+      if (!ok) return; Pedidos.cancelar(p.id); toast("Pedido cancelado.");
+    }
+    render();
+  });
+  $("busca").onsubmit = e => { e.preventDefault(); termo = $("termo").value.trim(); render(); };
+  $("termo").oninput = () => { if (!$("termo").value.trim() && termo) { termo = ""; render(); } };
+  $("abas").onclick = e => { const b = e.target.closest("button"); if (!b) return; aba = b.dataset.a;
+    document.querySelectorAll("#abas button").forEach(x => x.classList.toggle("ativa", x === b)); render(); };
+  render();
+}
+</script></body></html>

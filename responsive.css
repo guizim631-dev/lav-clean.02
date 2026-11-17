@@ -1,0 +1,26 @@
+@media(max-width:1024px){.grade{grid-template-columns:1fr}.servicos-mini{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:900px){
+  .auth{grid-template-columns:1fr;background:linear-gradient(160deg,#dff1fc,#9fd8f3)}
+  .auth-marca{padding:28px 20px 8px;background:none;align-items:center;text-align:center}
+  .auth-marca h2,.auth-marca>p,.vantagens,.maquina{display:none}
+  .auth-marca .logo{font-size:2.4rem}
+  .topo{padding:12px 16px;gap:12px;justify-content:space-between}.topo-nav,.lateral{display:none}
+  .topo .logo{font-size:1.5rem}
+  .corpo{grid-template-columns:1fr}
+  main{padding:18px 16px 96px}
+  .boas-vindas{padding:20px}.boas-vindas .maq{display:none}
+  .lista-servicos{grid-template-columns:1fr}
+  .abas{display:flex;position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid var(--borda);justify-content:space-around;padding:6px;z-index:10}
+  .abas a,.abas .link-btn{flex-direction:column;gap:2px;font-size:.7rem;padding:6px 8px}
+  .btn{min-height:48px}
+  .acoes-centro .btn{width:100%}
+}
+@media(max-width:400px){.servicos-mini{grid-template-columns:1fr 1fr}.cartao{padding:20px}}
+@media(max-width:900px){.logo-img{max-width:240px;margin:0 auto}}
+
+@media(max-width:900px){.topo{padding:10px 16px}.topo .logo-img{height:36px}.topo-nome{display:none}.topo-user{padding:3px}.topo::after{display:none}
+.abas a.ativo{color:var(--azul);font-weight:700;background:var(--claro)}}
+@media(max-width:900px){.duas-colunas{grid-template-columns:1fr}.perfil-topo{flex-wrap:wrap}.stats{margin-left:0;width:100%}.stat{flex:1}
+ .pedido{grid-template-columns:auto 1fr}.pedido .valor{grid-column:1/-1;text-align:left;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px}.pedido .valor .preco{margin:0}
+ .modal-acoes .btn{flex:1}.grade-form .c2,.grade-form .c3,.grade-form .c4{grid-column:span 6}.grade-form .c2.m3{grid-column:span 3}.busca .btn{min-height:0}}
+@media(max-width:900px){.login-img{display:none}.faixa img{display:none}.cabeca-img{height:40px}.loja-topo{grid-template-columns:1fr}.loja-topo>img{min-height:0;height:auto}.mapa iframe{height:260px}.hero-img{display:none}}

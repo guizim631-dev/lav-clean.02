@@ -1,0 +1,19 @@
+<!DOCTYPE html><html lang="pt-BR"><head><meta charset="UTF-8"><link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#0b4f87"><link rel="icon" href="icon-192.png"><link rel="apple-touch-icon" href="apple-touch-icon.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="Lav Clean"><meta name="apple-mobile-web-app-status-bar-style" content="default"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><link rel="stylesheet" href="style.css"><link rel="stylesheet" href="responsive.css"><title>Início — Lav Clean</title></head><body>
+<div id="shell"></div>
+<div class="corpo"><span hidden></span><main>
+ <section class="boas-vindas"><div><h1 id="saudacao"></h1><p>O que você deseja fazer?</p><a class="btn" href="servicos.html" id="iniciar">Iniciar atendimento</a></div>
+  <img class="hero-img" src="maquina.svg" alt=""></section>
+ <div class="grade"><section><h2 style="margin-bottom:12px">Nossos serviços</h2><div class="servicos-mini" id="mini"></div></section>
+  <div class="coluna-lateral"><aside class="card"><h3>Como funciona?</h3><ol class="passos"><li>Escolha o serviço</li><li>Confirme o pedido</li><li>Acompanhe o status</li><li>Retire suas roupas</li></ol></aside><a class="card loja-card" href="endereco.html"><img src="loja.svg" alt="Fachada da loja"><strong>Nossa loja</strong><small id="lojaEnd"></small></a></div></div>
+<section class="faixa"><div><h2>Roupas limpas, mais tempo para você</h2><p>Praticidade, qualidade e cuidado com o que é importante.</p></div><img src="toalhas-cesto.svg" alt=""></section>
+</main></div>
+<script src="storage.js"></script><script src="validation.js"></script><script src="services.js"></script><script src="auth.js"></script><script src="loja.js"></script><script src="app.js"></script>
+<script>
+const u = Auth.exigirSessao(); if(u){ montarLayout("inicio.html", u);
+ document.querySelector(".corpo").prepend(document.querySelector(".lateral"));
+ lojaEnd.textContent = LOJA.enderecoTexto;
+ saudacao.textContent = "Olá, "+u.nome.split(" ")[0]+"!";
+ iniciar.insertAdjacentHTML("beforeend", icone("arrow",18));
+ mini.innerHTML = Servicos.listar().map(s=>`<a class="card" href="servicos.html?s=${s.id}"><div class="ic">${icone(s.icone,34)}</div><strong>${s.nome}</strong><div class="preco">${Servicos.formatar(s.preco)}</div></a>`).join("")
+  + `<a class="card" href="servicos.html"><div class="ic">${icone("arrow",34)}</div><strong>Ver todos</strong></a>`; }
+</script></body></html>

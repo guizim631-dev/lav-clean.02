@@ -1,0 +1,24 @@
+<!DOCTYPE html><html lang="pt-BR"><head><meta charset="UTF-8"><link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#0b4f87"><link rel="icon" href="icon-192.png"><link rel="apple-touch-icon" href="apple-touch-icon.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="Lav Clean"><meta name="apple-mobile-web-app-status-bar-style" content="default"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><link rel="stylesheet" href="style.css"><link rel="stylesheet" href="responsive.css"><title>Escolher serviço — Lav Clean</title></head><body>
+<div id="shell"></div>
+<div class="corpo"><main>
+ <div class="cabeca-pagina"><h1>Escolha o serviço</h1><img class="cabeca-img" src="roupas.svg" alt=""></div>
+ <form id="form" novalidate><fieldset style="border:0"><legend class="erro" id="msg" role="alert"></legend>
+  <div class="lista-servicos" id="lista"></div></fieldset>
+  <div class="acoes-centro"><button class="btn" id="continuar" type="submit" disabled>Continuar</button></div></form>
+</main></div>
+<script src="storage.js"></script><script src="validation.js"></script><script src="services.js"></script><script src="auth.js"></script><script src="app.js"></script>
+<script>
+const u = Auth.exigirSessao(); if(u){ montarLayout("servicos.html", u);
+ document.querySelector(".corpo").prepend(document.querySelector(".lateral"));
+ const pre = new URLSearchParams(location.search).get("s") || (Servicos.escolhido()||{}).id;
+ lista.innerHTML = Servicos.listar().map(s=>`<label class="opcao"><input type="radio" name="servico" value="${s.id}" ${s.id===pre?"checked":""}>
+  <div class="card"><span class="marca">${icone("check",14)}</span><div class="ic">${icone(s.icone,40)}</div><h3>${s.nome}</h3><p>${s.descricao}</p><div class="preco">${Servicos.formatar(s.preco)}</div></div></label>`).join("");
+ continuar.insertAdjacentHTML("beforeend", icone("arrow",18));
+ const atual = () => document.querySelector("input[name=servico]:checked");
+ const atualizar = () => { continuar.disabled = !atual(); msg.textContent=""; };
+ lista.onchange = atualizar; atualizar();
+ form.onsubmit = e => { e.preventDefault(); const s=atual();
+  if(!s){ msg.textContent="Selecione um serviço para continuar."; return; }
+  Servicos.escolher(s.value); location.href="confirmar-pedido.html"; };
+}
+</script></body></html>
